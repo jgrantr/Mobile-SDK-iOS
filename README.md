@@ -6,37 +6,45 @@ The DJI Mobile SDK enables you to automate your DJI Product. You can control fli
 
 ## Get Started Immediately
 
-### Download Sample Code
+### SDK Installation with CocoaPods
 
-Since the "DJISDK.framework" supports **Bitcode** now, the file size is **146.1MB**, which exceeds GitHub's file size limit of 100 MB for pushing and pulling. So you must use [Git Large File Storage](https://git-lfs.github.com) for downloading the SDK framework file.
+Since this project has been integrated with [DJI iOS SDK CocoaPods](https://cocoapods.org/pods/DJI-SDK-iOS) now, please check the following steps to install **DJISDK.framework** using CocoaPods after you downloading this project:
 
-Please check the following steps to download the entire Sample Code with SDK framework:
+**1.** Install CocoaPods
 
-**1.** You need to install [Git Large File Storage](https://git-lfs.github.com) by running the following commands in Terminal:
-
-~~~
-brew install git-lfs
-git lfs install
-~~~
-> Note: Please check [Git LFS Website](https://git-lfs.github.com) for more details.
-
-**2.** Be sure to restart your Terminal after installing Git LFS.
-
-**3.** Use `git clone` command to clone the sample code project rather than downloading the ZIP file directly:
+Open Terminal and change to the download project's directory, enter the following command to install it:
 
 ~~~
-git clone git@github.com:dji-sdk/Mobile-SDK-iOS.git
+sudo gem install cocoapods
 ~~~
 
-**4.** If you have already cloned the sample code project before, please run the following commands in the project's path to download the **DJISDK.framework** file: 
+The process may take a long time, please wait. For further installation instructions, please check [this guides](https://guides.cocoapods.org/using/getting-started.html#getting-started).
+
+**2.** Install SDK with CocoaPods in the Project
+
+Run the following command in the **ObjcSampleCode** and **SwiftSampleCode** folders' directory:
 
 ~~~
-git reset HEAD --hard
+pod install
+~~~
+
+If you install it successfully, you may get the messages similar to the followings:
+
+~~~
+Analyzing dependencies
+Downloading dependencies
+Installing DJI-SDK-iOS (3.5)
+Generating Pods project
+Integrating client project
+
+[!] Please close any current Xcode sessions and use `DJISdkDemo.xcworkspace` for this project from now on.
+Pod installation complete! There is 1 dependency from the Podfile and 1 total pod
+installed.
 ~~~
 
 ### Run Sample Code
 
-Developers can [run the sample application](https://developer.dji.com/mobile-sdk/documentation/quick-start/index.html) to immediately run code and see how the DJI Mobile SDK can be used.
+Developers can [run the sample application](https://developer.dji.com/mobile-sdk/documentation/quick-start/index.html) immediately to see how the DJI Mobile SDK can be used.
 
 One of DJI's aircraft or handheld cameras will be required to run the sample application. 
 
@@ -72,10 +80,6 @@ Please visit [DJI Mobile SDK Documentation](https://developer.dji.com/mobile-sdk
 ## SDK API Reference
 
 [**iOS SDK API Documentation**](https://developer.dji.com/iframe/mobile-sdk-doc/ios/index.html)
-
-## CocoaPods Support
-
-DJI iOS SDK supports CocoaPods now. Please check this link for details: <https://cocoapods.org/pods/DJI-SDK-iOS>.
 
 ## FFmpeg Customization
 
