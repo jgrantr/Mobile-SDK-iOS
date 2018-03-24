@@ -29,7 +29,7 @@
  */
 @interface MediaPlaybackViewCell : UITableViewCell
 
-@property (nonatomic) DJIMedia *media;
+@property (nonatomic) DJIMediaFile *media;
 
 @end
 
@@ -40,11 +40,12 @@
 @interface CameraMediaPlaybackViewController ()
 <DJIMediaManagerDelegate,
 DJICameraDelegate,
+DJIVideoFeedListener,
 UITableViewDataSource,
 UITableViewDelegate>
 
 @property (nonatomic) NSArray *mediaList;
-@property (nonatomic) DJIMedia *selectedMedia;
+@property (nonatomic) DJIMediaFile *selectedMedia;
 @property (weak, nonatomic) IBOutlet UIView *videoPreviewView;
 @property (nonatomic, weak) DJIMediaManager *mediaManager;
 @property (weak, nonatomic) IBOutlet UITableView *mediaListTable;
@@ -71,11 +72,14 @@ UITableViewDelegate>
     [super viewDidAppear:animated];
     [self fetchMediaList];
     [self setupVideoPreviewView];
+
+    [[DJISDKManager videoFeeder].primaryVideoFeed addListener:self withQueue:dispatch_get_main_queue()];
 }
 
 -(void)viewDidDisappear:(BOOL)animated {
     [super viewDidDisappear:animated];
     [self cleanupVideoPreviewView];
+    [[DJISDKManager videoFeeder].primaryVideoFeed removeListener:self];
 }
 
 - (void)fetchMediaList{
@@ -126,14 +130,13 @@ UITableViewDelegate>
     [self showActivityIndicator:YES];
     DJICamera *camera = [DemoComponentHelper fetchCamera];
     if (camera) {
-        [camera setCameraMode:DJICameraModeMediaDownload withCompletion:^(NSError * _Nullable error) {
+        [camera setMode:DJICameraModeMediaDownload withCompletion:^(NSError * _Nullable error) {
             if (error) {
                 ShowResult(@"SetCameraMode Failed: %@", error.description);
             }
             else {
-                WeakReturn(target); 
-                [self.mediaManager fetchMediaListWithCompletion:
-                 ^(NSArray<DJIMedia *> * _Nullable mediaList, NSError * _Nullable error) {
+                WeakReturn(target);
+                [self.mediaManager refreshFileListWithCompletion:^(NSError * _Nullable error) {
                      WeakReturn(target);
                      
                      [target showActivityIndicator:NO];
@@ -142,7 +145,7 @@ UITableViewDelegate>
                          ShowResult(@"Fetch media failed: %@", error.localizedDescription);
                      }
                      else {
-                         target.mediaList = mediaList;
+                         target.mediaList = [target.mediaManager fileListSnapshot];
                          [target.mediaListTable reloadData];
                      }
                  }];
@@ -244,8 +247,7 @@ UITableViewDelegate>
     cell.media = self.mediaList[indexPath.row];
     cell.textLabel.text = cell.media.fileName;
 
-    if (cell.media.mediaType == DJIMediaTypeM4V ||
-        cell.media.mediaType == DJIMediaTypeMOV ||
+    if (cell.media.mediaType == DJIMediaTypeMOV ||
         cell.media.mediaType == DJIMediaTypeMP4) {
         cell.accessoryType = UITableViewCellAccessoryCheckmark;
     }
@@ -321,8 +323,8 @@ UITableViewDelegate>
     return nil;
 }
 
--(void)camera:(DJICamera *)camera didReceiveVideoData:(uint8_t *)videoBuffer length:(size_t)size {
-    [[VideoPreviewer instance] push:videoBuffer length:(int)size];
+-(void)videoFeed:(DJIVideoFeed *)videoFeed didUpdateVideoData:(NSData *)videoData {
+    [[VideoPreviewer instance] push:(uint8_t *)[videoData bytes] length:(int)[videoData length]];
 }
 
 -(UIInterfaceOrientationMask)supportedInterfaceOrientations {

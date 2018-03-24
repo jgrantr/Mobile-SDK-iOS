@@ -39,14 +39,14 @@
     DJIFlightController* fc = [DemoComponentHelper fetchFlightController];
     if (fc) {        
         WeakRef(target);
-        [fc.flightLimitation getMaxFlightHeightWithCompletion:^(float height, NSError * _Nullable error) {
+        [fc getMaxFlightHeightWithCompletion:^(NSUInteger height, NSError * _Nullable error) {
             WeakReturn(target);
             if (error) {
                 ShowResult(@"Get Max Flight Height:%@", error.localizedDescription);
             }
             else
             {
-                target.heightLimitTextField.text = [NSString stringWithFormat:@"%0.1f", height];
+                target.heightLimitTextField.text = [NSString stringWithFormat:@"%tu", height];
             }
         }];
     }
@@ -60,7 +60,7 @@
     DJIFlightController* fc = [DemoComponentHelper fetchFlightController];
     if (fc) {
         WeakRef(target);
-        [fc.flightLimitation getMaxFlightRadiusLimitationEnabledWithCompletion:^(BOOL enabled, NSError * _Nullable error) {
+        [fc getMaxFlightRadiusLimitationEnabledWithCompletion:^(BOOL enabled, NSError * _Nullable error) {
             WeakReturn(target);
             if (error) {
                 ShowResult(@"Get RadiusLimitationEnable:%@", error.localizedDescription);
@@ -72,14 +72,14 @@
                 // We check the flight radius limitation only if it is enabled.
                 if (enabled) {
                     target.radiusLimitTextField.enabled = YES;
-                    [fc.flightLimitation getMaxFlightRadiusWithCompletion:^(float radius, NSError * _Nullable error) {
+                    [fc getMaxFlightRadiusWithCompletion:^(NSUInteger radius, NSError * _Nullable error) {
                         WeakReturn(target);
                         if (error) {
                             ShowResult(@"Get MaxFlightRadius:%@", error.localizedDescription);
                         }
                         else
                         {
-                            target.radiusLimitTextField.text = [NSString stringWithFormat:@"%0.1f", radius];
+                            target.radiusLimitTextField.text = [NSString stringWithFormat:@"%tu", radius];
                         }
                     }];
                 }
@@ -101,7 +101,7 @@
     DJIFlightController* fc = [DemoComponentHelper fetchFlightController];
     if (fc) {
         WeakRef(target);
-        [fc.flightLimitation setMaxFlightRadiusLimitationEnabled:sender.on withCompletion:^(NSError * _Nullable error) {
+        [fc setMaxFlightRadiusLimitationEnabled:sender.on withCompletion:^(NSError * _Nullable error) {
             if (error) {
                 ShowResult(@"setMaxFlightRadiusLimitationEnabled:%@", error.localizedDescription);
                 [sender setOn:!sender.on animated:YES];
@@ -111,14 +111,15 @@
                 WeakReturn(target);
                 if (sender.on) {
                     target.radiusLimitTextField.enabled = YES;
-                    [fc.flightLimitation getMaxFlightRadiusWithCompletion:^(float radius, NSError * _Nullable error) {
+                    DJIFlightController* fc = [DemoComponentHelper fetchFlightController];
+                    [fc getMaxFlightRadiusWithCompletion:^(NSUInteger radius, NSError * _Nullable error) {
                         WeakReturn(target);
                         if (error) {
                             ShowResult(@"%@", error.localizedDescription);
                         }
                         else
                         {
-                            target.radiusLimitTextField.text = [NSString stringWithFormat:@"%0.1f", radius];
+                            target.radiusLimitTextField.text = [NSString stringWithFormat:@"%tu", radius];
                         }
                     }];
                 }
@@ -136,7 +137,7 @@
 {
     DJIFlightController* fc = [DemoComponentHelper fetchFlightController];
     if (fc) {
-        [fc.flightLimitation setMaxFlightHeight:height withCompletion:^(NSError * _Nullable error) {
+        [fc setMaxFlightHeight:height withCompletion:^(NSError * _Nullable error) {
             if (error) {
                 ShowResult(@"setMaxFlightHeight:%@", error.localizedDescription);
             }
@@ -148,7 +149,7 @@
 {
     DJIFlightController* fc = [DemoComponentHelper fetchFlightController];
     if (fc) {
-        [fc.flightLimitation setMaxFlightRadius:radius withCompletion:^(NSError * _Nullable error) {
+        [fc setMaxFlightRadius:radius withCompletion:^(NSError * _Nullable error) {
             if (error) {
                 ShowResult(@"setMaxFlightRadius:%@", error.localizedDescription);
             }

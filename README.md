@@ -18,22 +18,22 @@ Open Terminal and change to the download project's directory, enter the followin
 sudo gem install cocoapods
 ~~~
 
-The process may take a long time, please wait. For further installation instructions, please check [this guides](https://guides.cocoapods.org/using/getting-started.html#getting-started).
+The process may take a long time, please wait. For further installation instructions, please check [this guide](https://guides.cocoapods.org/using/getting-started.html#getting-started).
 
 **2.** Install SDK with CocoaPods in the Project
 
-Run the following command in the **ObjcSampleCode** and **SwiftSampleCode** folders' directory:
+Run the following command in the **ObjcSampleCode** and **SwiftSampleCode** paths:
 
 ~~~
 pod install
 ~~~
 
-If you install it successfully, you may get the messages similar to the followings:
+If you install it successfully, you should get the messages similar to the following:
 
 ~~~
 Analyzing dependencies
 Downloading dependencies
-Installing DJI-SDK-iOS (3.5)
+Installing DJI-SDK-iOS (4.4)
 Generating Pods project
 Integrating client project
 
@@ -42,11 +42,24 @@ Pod installation complete! There is 1 dependency from the Podfile and 1 total po
 installed.
 ~~~
 
+> **Note**: If you saw "Unable to satisfy the following requirements" issue during pod install, please run the following commands to update your pod repo and install the pod again:
+> 
+> ~~~
+> pod repo update
+> pod install
+> ~~~
+
 ### Run Sample Code
 
-Developers can [run the sample application](https://developer.dji.com/mobile-sdk/documentation/quick-start/index.html) immediately to see how the DJI Mobile SDK can be used.
+Developers will need to setup the App Key by editing the sample code's info.plist, [after generating their unique App Key](https://developer.dji.com/mobile-sdk/documentation/quick-start/index.html#generate-an-app-key).
 
-One of DJI's aircraft or handheld cameras will be required to run the sample application. 
+For the Objective-C sample app, the key value **DJISDKAppKey** should to be added to DJISdkDemo-Info.plist with your unique app key as a string.  (It is no longer necessary to edit the "DJIRootViewController.m" as in previous versions of the DJI SDK.)
+
+For the Swift sample app, the DJISDKAppKey is present in the Info.plist - developers just need to add their unique key.
+In both cases developers will still need to update the [Bundle Identifier](http://developer.dji.com/user/mobile-sdk/ios-configuration/) .
+
+
+One of DJI's aircraft or handheld cameras will be required to run the sample application.  
 
 ## Development Workflow 
 
@@ -63,8 +76,11 @@ From registering as a developer, to deploying an application, the following will
 
 Several iOS tutorials are provided as examples on how to use different features of the Mobile SDK and debug tools includes:
 
+- [Application Activation and Aircraft Binding](http://developer.dji.com/mobile-sdk/documentation/ios-tutorials/ActivationAndBinding.html)
+- [Getting Started with DJI UI Library](http://developer.dji.com/mobile-sdk/documentation/ios-tutorials/UILibraryDemo.html)
 - [Camera Application](https://developer.dji.com/mobile-sdk/documentation/ios-tutorials/index.html)
 - [Photo and Video Playback Application](https://developer.dji.com/mobile-sdk/documentation/ios-tutorials/PlaybackDemo.html)
+- [Media Manager Application](http://developer.dji.com/mobile-sdk/documentation/ios-tutorials/MediaManagerDemo.html)
 - [MapView And Waypoint Application](https://developer.dji.com/mobile-sdk/documentation/ios-tutorials/GSDemo.html)
 - [Panorama Appliation](https://developer.dji.com/mobile-sdk/documentation/ios-tutorials/PanoDemo.html)
 - [TapFly and ActiveTrack Appliation](https://developer.dji.com/mobile-sdk/documentation/ios-tutorials/P4MissionsDemo.html)
@@ -73,23 +89,36 @@ Several iOS tutorials are provided as examples on how to use different features 
 - [Using the Bridge App](https://developer.dji.com/mobile-sdk/documentation/ios-tutorials/BridgeAppDemo.html)
 - [Using the Remote Logger](https://developer.dji.com/mobile-sdk/documentation/ios-tutorials/RemoteLoggerDemo.html)
 
+
 ## Learn More about DJI Products and the Mobile SDK
 
 Please visit [DJI Mobile SDK Documentation](https://developer.dji.com/mobile-sdk/documentation/introduction/index.html) for more details.
 
+## DJI Mobile UI Library
+
+DJI Mobile UILibrary is a suite of product agnostic UI objects that fast tracks the development of iOS applications using the DJI Mobile SDK. For more details, please check [here](https://github.com/dji-sdk/Mobile-UILibrary-iOS).
+
+## SDK Keys
+
+SDK Keys can be used as an alternative interface to access the product.
+
+A detailed introduction for SDK Keys is [here](./docs/README-KeyedInterface.md).
+
+## Missions Refactor
+
+Missions are an important part of the SDK as they allow developers to automate DJI's products using a simple, high level interface. In 4.0.1, missions are being refactored to be more robust and easier to manage.
+
+A detailed introduction for missions is [here](./docs/README-Mission.md).
+
 ## SDK API Reference
 
-[**iOS SDK API Documentation**](https://developer.dji.com/iframe/mobile-sdk-doc/ios/index.html)
+[**iOS SDK API Documentation**](http://developer.dji.com/api-reference/ios-api/index.html)
 
 ## FFmpeg Customization
 
 We have forked the original FFmpeg and added customized features to provide more video frame information including the frame's width and height, frame rate number, etc. These features will help to implement video hardware decoding. 
 
-The SDK Sample Code uses code of [FFmpeg](http://ffmpeg.org) licensed under the [LGPLv2.1](http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html) and its source code can be downloaded from this [Github Page](https://github.com/dji-sdk/FFmpeg).
-
-## Video Hardware Decoder Open Source
-
-Please check the [VideoPreviewer](https://github.com/dji-sdk/Mobile-SDK-iOS/tree/master/Sample%20Code/VideoPreviewer/VideoPreviewer) source code for details.
+The SDK Sample Code is dynamically linked with unmodified libraries of <a href=http://ffmpeg.org>FFmpeg</a> licensed under the <a href=http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html>LGPLv2.1</a>. The source code of these FFmpeg libraries, the compilation instructions, and the LGPL v2.1 license are provided in [Github](https://github.com/dji-sdk/FFmpeg).
 
 ## Support
 
@@ -98,4 +127,10 @@ You can get support from DJI with the following methods:
 - [**DJI Forum**](http://forum.dev.dji.com/en)
 - Post questions in [**Stackoverflow**](http://stackoverflow.com) using [**dji-sdk**](http://stackoverflow.com/questions/tagged/dji-sdk) tag
 - dev@dji.com
+
+## Join Us
+
+DJI is looking for all kinds of Software Engineers to continue building the Future of Possible. Available positions in Shenzhen, China and around the world. If you are interested, please send your resume to <software-sz@dji.com>. For more details, and list of all our global offices, please check <https://we.dji.com/jobs_en.html>.
+
+DJI 招软件工程师啦，based在深圳，如果你想和我们一起把DJI产品做得更好，请发送简历到 <software-sz@dji.com>.  详情请浏览 <https://we.dji.com/zh-CN/recruitment>.
 

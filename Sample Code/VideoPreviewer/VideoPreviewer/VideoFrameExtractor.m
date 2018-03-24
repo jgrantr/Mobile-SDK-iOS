@@ -11,6 +11,7 @@
 #import <sys/time.h>
 
 #include "libavformat/avformat.h"
+#include "libavcodec/avcodec.h"
 #include "libswscale/swscale.h"
 
 @interface VideoFrameExtractor (){
@@ -162,11 +163,17 @@ ss += ll; \
 -(void) privateParseVideo:(uint8_t*)buf length:(int)length withOutputBlock:(void (^)(AVPacket* frame))block
 {
     if(_pCodecCtx == NULL) return;
-    
-    
-    int paserLength_In = length;
+
+    // Need padding for FFMpeg. Otherwise Address Sanitizer will complain heap overflow.
+    size_t lengthWithPadding = length + FF_INPUT_BUFFER_PADDING_SIZE;
+    uint8_t *bufWithPadding = malloc(lengthWithPadding);
+    memset(bufWithPadding, 0, lengthWithPadding);
+    memcpy(bufWithPadding, buf, length);
+
+    uint8_t *paserBuffer_In = bufWithPadding;
+    int paserLength_In = (int)length;
     int paserLen;
-    uint8_t *paserBuffer_In = buf;
+
     while (paserLength_In > 0) {
         AVPacket packet;
         av_init_packet(&packet);
@@ -177,6 +184,11 @@ ss += ll; \
         if (packet.size > 0) {
             bool isSpsPpsFound = false;
             //int rate = getVideFrameRateWH(packet.data, packet.size, &isSpsPpsFound, &_outputWidth, &_outputHeight);
+            
+            if(_pCodecPaser->height_in_pixel == 1088){
+                //1080p hack
+                _pCodecPaser->height_in_pixel = 1080;
+            }
             
             _outputWidth = _pCodecPaser->width_in_pixel;
             _outputHeight = _pCodecPaser->height_in_pixel;
@@ -230,6 +242,11 @@ ss += ll; \
         
         av_free_packet(&packet);
     }
+
+    if (bufWithPadding) {
+        free(bufWithPadding);
+    }
+
 }
 
 -(void) parseVideo:(uint8_t*)buf length:(int)length withOutputBlock:(void (^)(uint8_t* frame, int size))block{
@@ -274,6 +291,11 @@ ss += ll; \
                 // something wrong;
             }
             
+            if(_pCodecPaser->height_in_pixel == 1088){
+                //1080p hack
+                _pCodecPaser->height_in_pixel = 1080;
+            }
+            
             outputFrame->frame_info.width = _pCodecPaser->width_in_pixel;
             outputFrame->frame_info.height = _pCodecPaser->height_in_pixel;
             
@@ -286,6 +308,7 @@ ss += ll; \
             outputFrame->frame_info.frame_flag.has_sps = _pCodecPaser->frame_has_sps;
             outputFrame->frame_info.frame_flag.has_pps = _pCodecPaser->frame_has_pps;
             outputFrame->frame_info.frame_flag.has_idr = (_pCodecPaser->key_frame ==1)?1:0;
+            outputFrame->frame_info.frame_flag.is_fullrange = NO; //we can only get this in sps, set this bit later
         }
         
         block(outputFrame);
@@ -316,6 +339,10 @@ ss += ll; \
         int got_picture;
         avcodec_decode_video2(_pCodecCtx, _pFrame, &got_picture, &packet);
         
+        if (_pCodecCtx->height == 1088) {
+            _pCodecCtx->height = 1080;
+        }
+        
         _outputWidth = _pCodecCtx->width;
         _outputHeight = _pCodecCtx->height;
         
@@ -339,6 +366,10 @@ ss += ll; \
         int got_picture;
         avcodec_decode_video2(_pCodecCtx, _pFrame, &got_picture, &packet);
         
+        if (_pCodecCtx->height == 1088) {
+            _pCodecCtx->height = 1080;
+        }
+        
         _outputWidth = _pCodecCtx->width;
         _outputHeight = _pCodecCtx->height;
         
@@ -359,6 +390,7 @@ ss += ll; \
         int paserLen;
         int decode_data_length;
         int got_picture = 0;
+
         uint8_t *paserBuffer_In = buf;
         while (paserLength_In > 0) {
             AVPacket packet;
@@ -378,7 +410,13 @@ ss += ll; \
             }
             
             av_free_packet(&packet);
-            if (_outputWidth != _pCodecCtx->width || _outputHeight != _pCodecCtx->height) {
+            
+            if (_pCodecCtx->height == 1088) {
+                _pCodecCtx->height = 1080;
+            }
+            
+            if (_outputWidth != _pCodecCtx->width
+                || _outputHeight != _pCodecCtx->height) {
                 _outputWidth = _pCodecCtx->width;
                 _outputHeight = _pCodecCtx->height;
                 continue;
@@ -391,7 +429,7 @@ ss += ll; \
             {
                 callback(YES);
             }
-        }        
+        }
     }
     return  YES;
 }
